@@ -21,10 +21,13 @@ from datetime import datetime,timedelta
 #读取数据集
 father_path="/Users/leidelong/competition/uai/UAI_Data/"
 hash_poi_info=pd.read_csv(father_path+"poi.csv",encoding="gb2312",sep=';')
-# train_Aug=pd.read_csv(father_path+"train_Aug.csv",encoding="gb2312")
-# train_July=pd.read_csv(father_path+"train_July.csv",encoding="gb2312")
-tmp=pd.read_csv(father_path+"train_Aug.csv",encoding="gb2312")
+train_Aug=pd.read_csv(father_path+"train_Aug.csv",encoding="gb2312")
+train_July=pd.read_csv(father_path+"train_July.csv",encoding="gb2312")
 test_public=pd.read_csv(father_path+"test_id_Aug_agg_public5k.csv")
+
+# tmp=pd.read_csv(father_path+"train_Aug.csv",encoding="gb2312")
+tmp=pd.concat([train_Aug,train_July]) #在纵轴上合并
+
 weather_info=pd.read_csv(father_path+"weather.csv",encoding="utf-8")
 weather_info=weather_info.drop(['text','wind_direction'],1)
 
@@ -33,6 +36,8 @@ day_waybill_count=pd.DataFrame({'count' : tmp.groupby('create_date')['id'].size(
 hour_waybill_count=pd.DataFrame({'count' : tmp.groupby('create_hour')['id'].size()}).reset_index()
 testid_waybill_count=pd.DataFrame({'count' : tmp.groupby(['create_date','create_hour','start_geo_id','end_geo_id'])['id'].size()}).reset_index()
 area2area_waybill_count=pd.DataFrame({'count' : tmp.groupby(['start_geo_id','end_geo_id'])['id'].size()}).reset_index()
+
+#数据分布用哪种？1）出现过的31*24*<区域，区域>对，还是<日期，时段，区域，区域>？
 
 waybill_count_extend1=testid_waybill_count.merge(hash_poi_info,how='left',left_on='start_geo_id',right_on='hash_id')
 waybill_count_extend1.rename(columns={'filling_station':'start_filling_station',
